@@ -2,14 +2,22 @@ import styled from "styled-components";
 import Left from "./Left";
 import Main from "./Main";
 import Right from "./Right";
-const Home = () => {
+import { useNavigate } from "react-router-dom";
+import {  connect } from "react-redux";
+
+const Home = (props) => {
+  let navigate=useNavigate();
   return (
     <Container>
+      {
+      !props.user && navigate("/")
+      }
       <Layout>
         <Left />
         <Main />
         <Right />
       </Layout>
+      
     </Container>
   );
 };
@@ -35,5 +43,9 @@ margin:25px 0;
     flex-direction:column;
     padding:0 5px;
 }`;
-
-export default Home;
+const mapStateToProps=(state)=>{
+  return {
+    user:state.userState.user,
+  }
+}
+export default connect(mapStateToProps)(Home);
