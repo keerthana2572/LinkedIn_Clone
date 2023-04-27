@@ -1,105 +1,139 @@
 import styled from "styled-components";
-const Main=(props)=>{
-    return (<Container>
-        <Share>
-            Share
-            <div>
-                <img src='images/user.svg'/>
-                <button>Start a post</button> 
-            </div>
-            <div>
-                <button>
-                    <img src='images/photo-icon.svg'/>
-                    <span>Photo</span>
-                </button>
-                <button>
-                    <img src='images/video-icon.svg'/>
-                    <span>video</span>
-                </button>
-                <button>
-                    <img src='images/event-icon.svg'/>
-                    <span>Event</span>
-                </button>
-                
-                <button>
-                    <img src='images/article-icon.svg'/>
-                    <span>Write Article</span>
-                </button>
-            </div>
-        </Share>
-        <div>
-            <Article>
-                <SharedPost>
-                    <a>
-                        <img src='images/user.svg'/>
-                        <div>
-                            <span>Title</span>
-                            <span>Info</span>
-                            <span>Date</span>
-                        </div>
-                    </a>
-                    <button>
-                        <img src='images/ellipsis.png'/>
-                    </button>
-                    
-                </SharedPost>
-                <Description>Description</Description>
-                    <SharedImg>
-                        <a>
-                            <img src='/images/shared.jpg'/>
-                        </a>
-                    </SharedImg>
-                    <SocialCounts>
-                        <li>
-                            <button>
-                                <img src='images/like.png'/>
-                                <img src='images/claps.png'/>
-                                <span>25</span>
-                            </button>
-                        </li>
-                        <li>
-                            <a>
-                                1 comment
-                            </a>
-                        </li>
-                    </SocialCounts>
-                    <SocialFooter>
-                    <button>
-                        <img src='images/like-out.png'/>
-                        <span>Like</span>
-                    </button>
-                    <button>
-                        <img src='/images/comment.png'/>
-                        <span>Comments</span>
-                    </button>
-                    <button>
-                        <img src='/images/share-icon.png'/>
-                        <span>Share</span>
-                    </button>
-                    <button>
-                        <img src='/images/send.png'/>
-                        <span>Send</span>
-                    </button>
-                    </SocialFooter>
-            </Article>
-        </div>
-    </Container>
-)
-    
-}
-const Container=styled.div`
-grid-area:main;
-`;
-const CommonCard=styled.div`
-text-align:center;
-overflow:hidden;
-margin-bottom:8px;
-border-radius:5px;
-position:relative;
-border:none;
-box-shadow:0 0 0 1px rgb(0 0 0/15%), 0 0 0 rgb(0 0 0/20%);`;
+import PostModal from "./PostModal";
+import { useEffect } from "react";
+import { useState } from "react";
+import { connect } from "react-redux";
+import { getArticlesAPI } from "../actions";
+const Main = (props) => {
+  const [showModal, setshowModal] = useState("close");
 
-const Share=styled(CommonCard)`
+  useEffect(() => {
+    props.getArticlesAPI();
+  }, []);
+  const handleClick = (e) => {
+    e.preventDefault();
+    if (e.target !== e.currentTarget) {
+      return;
+    }
+    switch (showModal) {
+      case "open":
+        setshowModal("close");
+        break;
+      case "close":
+        setshowModal("open");
+        break;
+      default:
+        setshowModal("close");
+        break;
+    }
+  };
+  return (
+    <Container>
+      <Share>
+        <div>
+          {props.user && props.user.photoURL ? (
+            <img src={props.user.photoURL} />
+          ) : (
+            <img src="images/user.svg" />
+          )}
+          <button onClick={handleClick} disabled={props.loading ? true : false}>
+            Start a post
+          </button>
+        </div>
+        <div>
+          <button>
+            <img src="images/photo-icon.svg" />
+            <span>Photo</span>
+          </button>
+          <button>
+            <img src="images/video-icon.svg" />
+            <span>video</span>
+          </button>
+          <button>
+            <img src="images/event-icon.svg" />
+            <span>Event</span>
+          </button>
+
+          <button>
+            <img src="images/article-icon.svg" />
+            <span>Write Article</span>
+          </button>
+        </div>
+      </Share>
+      <Content>
+        {props.loading && <img src="./images/loading.gif" />}
+
+        <PostModal showModal={showModal} handleClick={handleClick} />
+
+        <Article>
+          <SharedPost>
+            <a>
+              <img src="images/user.svg" />
+              <div>
+                <span>Title</span>
+                <span>Info</span>
+                <span>Date</span>
+              </div>
+            </a>
+            <button>
+              <img src="images/ellipsis.png" />
+            </button>
+          </SharedPost>
+          <Description>Description</Description>
+          <SharedImg>
+            <a>
+              <img src="/images/shared.jpg" />
+            </a>
+          </SharedImg>
+          <SocialCounts>
+            <li>
+              <button>
+                <img src="images/like.png" />
+                <img src="images/claps.png" />
+                <span>25</span>
+              </button>
+            </li>
+            <li>
+              <a>1 comment</a>
+            </li>
+          </SocialCounts>
+          <SocialFooter>
+            <button>
+              <img src="images/like-out.png" />
+              <span>Like</span>
+            </button>
+            <button>
+              <img src="/images/comment.png" />
+              <span>Comments</span>
+            </button>
+            <button>
+              <img src="/images/share-icon.png" />
+              <span>Share</span>
+            </button>
+            <button>
+              <img src="/images/send.png" />
+              <span>Send</span>
+            </button>
+          </SocialFooter>
+        </Article>
+      </Content>
+    </Container>
+  );
+};
+const Container = styled.div`
+  grid-area: main;
+`;
+const CommonCard = styled.div`
+  text-align: center;
+  overflow: hidden;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  position: relative;
+  border: none;
+  box-shadow: 0 0 0 1px rgb(0 0 0/15%), 0 0 0 rgb(0 0 0/20%);
+`;
+
+const Share = styled(CommonCard)`
 display:flex;
 flex-direction:column;
 color:#958b7b;
@@ -156,11 +190,12 @@ div{
         }
     }
 }`;
-const Article=styled(CommonCard)`
-padding:0;
-margin: 0 0 8px;
-overflow:visible;`;
-const SharedPost=styled.div`
+const Article = styled(CommonCard)`
+  padding: 0;
+  margin: 0 0 8px;
+  overflow: visible;
+`;
+const SharedPost = styled.div`
 padding-right:40px;
 flex-wrap:nowrap;
 padding 12px 16px 0;
@@ -214,65 +249,82 @@ button{
     outline:none;
     
 }`;
-const Description=styled.div`
-padding:0 16px;
-overflow:hidden;
-color:rgba(0,0, 0,0.9);
-font-size:14px;
-text-align:left;
+const Description = styled.div`
+  padding: 0 16px;
+  overflow: hidden;
+  color: rgba(0, 0, 0, 0.9);
+  font-size: 14px;
+  text-align: left;
 `;
-const SharedImg=styled.div`
-margin-top:8px;
-width:100%;
-display:block;
-position:relative;
-background-color:#f9fafb;
-img{
-    object-fit:contain;
-    width:100%;
-    height:100%;
-}
+const SharedImg = styled.div`
+  margin-top: 8px;
+  width: 100%;
+  display: block;
+  position: relative;
+  background-color: #f9fafb;
+  img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+  }
 `;
-const SocialCounts=styled.ul`
-line-height:1.3;
-display:flex;
-align-items:flex-start;
-overflow:auto;
-margin:0 16px;
-padding:8px 0 ;
-border-bottom:1px solid #e9e5df;
-list-style:none;
-li{
-    margin-right:5px;
-    font-size:12px;
-    button{
-        display:flex;
-        font-size:20px;
-        img{
-            height:20px;
-            padding:1px;
-        }
+const SocialCounts = styled.ul`
+  line-height: 1.3;
+  display: flex;
+  align-items: flex-start;
+  overflow: auto;
+  margin: 0 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9e5df;
+  list-style: none;
+  li {
+    margin-right: 5px;
+    font-size: 12px;
+    button {
+      display: flex;
+      font-size: 20px;
+      img {
+        height: 20px;
+        padding: 1px;
+      }
     }
-}
+  }
 `;
-const SocialFooter=styled.div`
-display:inline-flex;
-justify-content:space-between;
-border-radius:5px;
-span{
-    font-size:14px;
-}
-button{
-    border:none;
-    padding:8px;
-    color:#0a66c2;
-    &:hover{
-        background-color:white;
+const SocialFooter = styled.div`
+  display: inline-flex;
+  justify-content: space-between;
+  border-radius: 5px;
+  span {
+    font-size: 14px;
+  }
+  button {
+    border: none;
+    padding: 8px;
+    color: #0a66c2;
+    &:hover {
+      background-color: white;
     }
-}
-img{
-    height:20px;
-}
+  }
+  img {
+    height: 20px;
+  }
+`;
+const Content = styled.div`
+  text-align: center;
+  & > img {
+    width: 30px;
+  }
 `;
 
-export default Main;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.articleState.loading,
+    user: state.userState.user,
+    articles: state.articleState.articles,
+  };
+};
+const mapDispatchToProps = (dispatch) => ({
+  getArticles: () => dispatch(getArticlesAPI()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
