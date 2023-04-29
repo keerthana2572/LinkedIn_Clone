@@ -11,7 +11,10 @@ export const setLoading = (status) => ({
   status: status,
 });
 
-export const getArticles = (payload) => {};
+export const getArticles = (payload) => ({
+  type:GET_ARTICLES,
+  payload:payload,
+});
 export function signInAPI() {
   return (dispatch) => {
     auth
@@ -106,6 +109,7 @@ export function getArticlesAPI() {
       .onSnapshot((snapshot) => {
         payload = snapshot.docs.map((doc) => doc.data());
         console.log(payload);
+        dispatch(getArticles(payload));
       });
   };
 }

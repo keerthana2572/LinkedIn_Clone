@@ -3,12 +3,13 @@ import PostModal from "./PostModal";
 import { useEffect } from "react";
 import { useState } from "react";
 import { connect } from "react-redux";
-import { getArticlesAPI } from "../actions";
+import { getArticlesAPI}  from "../actions";
+import ReactPlayer from "react-player";
 const Main = (props) => {
   const [showModal, setshowModal] = useState("close");
 
   useEffect(() => {
-    props.getArticlesAPI();
+    props.getArticles();
   }, []);
   const handleClick = (e) => {
     e.preventDefault();
@@ -28,6 +29,11 @@ const Main = (props) => {
     }
   };
   return (
+    <>
+    {
+      props.articles.length===0?
+      <p>There are no article</p>
+      :
     <Container>
       <Share>
         <div>
@@ -62,27 +68,35 @@ const Main = (props) => {
       </Share>
       <Content>
         {props.loading && <img src="./images/loading.gif" />}
-
         <PostModal showModal={showModal} handleClick={handleClick} />
-
-        <Article>
+        {props.articles.length>0 &&
+        props.articles.map((article,key)=>(
+          <Article key={key}>
           <SharedPost>
             <a>
-              <img src="images/user.svg" />
+              <img src={article.actor.image} />
               <div>
-                <span>Title</span>
-                <span>Info</span>
-                <span>Date</span>
+                <span>{article.actor.title}</span>
+                <span>{article.actor.description}</span>
+                <span>{article.actor.date.toDate().toLocaleDateString()}</span>
               </div>
             </a>
             <button>
               <img src="images/ellipsis.png" />
             </button>
           </SharedPost>
-          <Description>Description</Description>
+          <Description>{article.description}</Description>
           <SharedImg>
             <a>
-              <img src="/images/shared.jpg" />
+              {
+                !article.sharedImg && article.video?<ReactPlayer width={'100%'} url={article.video}/>
+              
+              :
+              (
+                  <img src={article.sharedImg}/>
+              )
+            }
+              
             </a>
           </SharedImg>
           <SocialCounts>
@@ -94,7 +108,7 @@ const Main = (props) => {
               </button>
             </li>
             <li>
-              <a>1 comment</a>
+              <a>{article.comments}</a>
             </li>
           </SocialCounts>
           <SocialFooter>
@@ -116,8 +130,11 @@ const Main = (props) => {
             </button>
           </SocialFooter>
         </Article>
+        ))}
       </Content>
     </Container>
+    }
+    </>
   );
 };
 const Container = styled.div`
@@ -283,6 +300,8 @@ const SocialCounts = styled.ul`
     button {
       display: flex;
       font-size: 20px;
+      border:none;
+      background-color:white;
       img {
         height: 20px;
         padding: 1px;
@@ -301,9 +320,9 @@ const SocialFooter = styled.div`
     border: none;
     padding: 8px;
     color: #0a66c2;
-    &:hover {
-      background-color: white;
-    }
+    
+      
+    
   }
   img {
     height: 20px;
@@ -321,7 +340,7 @@ const mapStateToProps = (state) => {
     loading: state.articleState.loading,
     user: state.userState.user,
     articles: state.articleState.articles,
-  };
+  }
 };
 const mapDispatchToProps = (dispatch) => ({
   getArticles: () => dispatch(getArticlesAPI()),
